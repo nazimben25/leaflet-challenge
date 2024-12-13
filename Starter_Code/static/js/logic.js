@@ -1,7 +1,8 @@
 // Creating the map object
 let myMap = L.map("map", {
-    center: [40.7, -73.95],
-    zoom: 3
+    // define center as town of provo,ut,USA
+    center: [40.14, -111.39],
+    zoom: 5.3
   });
   
   // Adding the tile layer
@@ -27,51 +28,41 @@ console.log(url)
                                                         let latitude = response.features[i].geometry.coordinates[0] ;
                                                         let longitude = response.features[i].geometry.coordinates[1] ; 
 
-                                                        // retrieve size of earthquake as Magnitude from json file and store it in variables                                                        
+                                                        // retrieve size and depth of earthquake as Magnitude from json file and store it in variables                                                        
                                                         let mag = response.features[i].properties.mag;
-                                                        
-                                                        
-                                                        
+                                                        let depth = response.features[i].geometry.coordinates[2] ;
+
+                                                        // retrieve other elements to be used in popup from json file and store it in variables    
+                                                        let place = response.features[i].properties.place ;                                                                                                                                              
+                                                        let time =  response.features[i].properties.time ;
+                                                                    // Format the Unix time const using formatUnixTime (see below)
+                                                                    formattedTime = formatUnixTime(time);
+
+                                                        // create circle marker  with 
+                                                        // marker's size proportional to the magnitude (x10000 for visibility)
+                                                        // color follows of the depth 
                                                         L.circle([longitude, latitude], {
-                                                                                                                        fillOpacity: 0.75,
-                                                                                                                        color: "red",
-                                                                                                                        fillColor: "purple",
-                                                                                                                        // Setting our circle's radius to equal the output of our markerSize() function:
-                                                                                                                        // This will make our marker's size proportionate to its population.
-                                                                                                                        radius: mag*10000
-                                                                                                                    })
-                                                    .addTo(myMap)  ;
-
-
-   
-    }
+                                                                                        fillOpacity: 0.75,
+                                                                                        color: "black",
+                                                                                        fillColor: "green",
+                                                                                        // Setting our circle's radius to equal the output of our markerSize() function:
+                                                                                        // This will make our marker's size proportionate to its population.
+                                                                                        radius: mag*10000
+                                                                                        })
+    
+    // popups that provide additional information : place, magnitude, depth and date
+    .bindPopup(`<h2>Place : ${place}</h2><hr><h3>Magnitude : ${mag}</h3><hr><h3>Depth : ${depth}</h3><hr><h3>Date (mm/dd/yyyy): ${formattedTime}</h3>`)
+    .addTo(myMap)  ;
  
-  });
+}
+     });
 
-// // this code works but as marker cluster
-//   // Get the data with d3.
-//   d3.json(url).then(function(response) { console.log(response); 
-//     // Create a new marker cluster group. 
-//     let markers = L.markerClusterGroup(); let locationsList = []; 
-    
-//     // Loop through the features array in the response using a for loop. 
-    
-//     for (let i = 0; i < response.features.length; i++) { 
-//         // Set the data location property to a variable. 
-//          
 
-//         // Check for the location property. 
-        
-//         if (location) { 
-//         // Add a new marker to the cluster group, and bind a popup. 
-        
-//         markers.addLayer(L.marker([location.coordinates[1], location.coordinates[0]])); locationsList.push(location);    
-//     }
-  
-//     }
+// Function to convert Unix timestamp to MM-DD-YYYY T format (code From ChatGPT)
+function formatUnixTime(unixTime) { 
+const date = new Date(unixTime );  
+const month = ("0" + (date.getMonth() + 1)).slice(-2); // Add leading zero 
+const day = ("0" + date.getDate()).slice(-2); // Add leading zero 
+const year = date.getFullYear(); 
+return `${month}-${day}-${year}`; } 
 
-//     console.log(`location list is ${locationsList}`)
-//     // Add our marker cluster layer to the map.
-//     myMap.addLayer(markers);
-  
-//   });
