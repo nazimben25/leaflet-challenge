@@ -11,17 +11,14 @@ let myMap = L.map("map", {
   }).addTo(myMap);
   
 // Store the API query variables.
-
-  
 let url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
   
 console.log(url)
 
   // Get the data with d3.
-  d3.json(url).then(function(response) { console.log(response); 
-    // Create a new marker cluster group. 
+  d3.json(url).then(function(response) { 
+    console.log(response); 
 
-   
     // Loop through the features array in the response using a for loop. 
     for (let i = 0; i <  response.features.length; i++) {
                                                         // retrieve coordinates from json file and store them in variables
@@ -43,8 +40,8 @@ console.log(url)
                                                         // color follows of the depth 
                                                         L.circle([longitude, latitude], {
                                                                                         fillOpacity: 0.75,
-                                                                                        color: "black",
-                                                                                        fillColor: "green",
+                                                                                        color: "white",
+                                                                                        fillColor: colorscale(depth),
                                                                                         // Setting our circle's radius to equal the output of our markerSize() function:
                                                                                         // This will make our marker's size proportionate to its population.
                                                                                         radius: mag*10000
@@ -53,9 +50,50 @@ console.log(url)
     // popups that provide additional information : place, magnitude, depth and date
     .bindPopup(`<h2>Place : ${place}</h2><hr><h3>Magnitude : ${mag}</h3><hr><h3>Depth : ${depth}</h3><hr><h3>Date (mm/dd/yyyy): ${formattedTime}</h3>`)
     .addTo(myMap)  ;
- 
+
 }
-     });
+
+    // Add legend to the map
+    const legend = L.control({ position: "bottomright" });
+  
+    legend.onAdd = function(map) {
+
+        const div = L.DomUtil.create("div", "info legend");
+
+        const depths = ["<10", "10-30", "30-50", "50-70", "70+"];
+        // const labels = ["<10", "10-30", "30-50", "50-70", "70+"];
+        const colors = ["#008000", "#ADFF2F", "#FAFAD2", "#FFA500", "#FF4500"];
+  
+    // Generate a label with a colored square for each interval 
+    for (let i = 0; i < depths.length; i++) { 
+                    div.innerHTML += 
+                    '<i style="background:' + colors[i] + '"></i> ' +
+                     depths[i] + '<br>'
+                } 
+    return div;
+    };
+  
+    legend.addTo(myMap);
+
+
+
+});
+
+// function "colorscale" to assign a color to different depths
+function colorscale(depth) {
+                            if (depth > 70) {
+                                return "#FF4500"; // orange red
+                            } else if (depth > 50) {
+                                return "#FFA500"; //orange
+                            } else if (depth > 30) {
+                                return "#FAFAD2"; //LightGoldenRodYellow
+                            } else if (depth > 10) {
+                                return "#ADFF2F"; // Greenyellow
+                            } else {
+                                return "#008000"; // Green
+                            }
+                        }
+
 
 
 // Function to convert Unix timestamp to MM-DD-YYYY T format (code From ChatGPT)
