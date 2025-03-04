@@ -1,3 +1,8 @@
+# Using JS_LEAFLET
+# Visualize an earthquake dataset United States Geological Survey, or USGS for the last 7 days
+
+
+
 # leaflet-challenge
 
 output for challenge 15 : leaflet
